@@ -19,4 +19,6 @@ public class RegisterEmailVO {
     String username;
     @Length(min = 6,max = 20)
     String password;
+    @Length(min = 4,max = 8)
+    String nickname;
 }

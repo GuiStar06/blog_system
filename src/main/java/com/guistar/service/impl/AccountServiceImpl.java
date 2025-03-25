@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,36 +66,79 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             if(!flowUtils.allowRequest(ip)){
                 return "请求频繁，稍后再试";
             }
-            int code = new Random().nextInt(900000) + 100000;
+            String code = generateCode(6);
             Map<String,Object> data = Map.of("email",email,"type",type,"code",code);
             amqpTemplate.convertAndSend(Const.MAIL_QUEUE,data);
-            template.opsForValue().set(Const.REGISTER_EMAIL_CODE + email,String.valueOf(code),3, TimeUnit.MINUTES);
+            if(type.equals("register")) {
+                template.opsForValue().set(Const.REGISTER_EMAIL_CODE + email,code,3, TimeUnit.MINUTES);
+            }
+            template.opsForValue().set(Const.RESET_EMAIL_CODE + email,code,3, TimeUnit.MINUTES);
         }
         return null;
     }
 
     @Override
     public String registerEmailAccount(RegisterEmailVO registerEmailVO) {
-        return "";
+        String email = registerEmailVO.getEmail();
+        String code = template.opsForValue().get(Const.REGISTER_EMAIL_CODE + email);
+        if(code == null || registerEmailVO.getCode() == null) return "请先获取验证码";
+        if(isExistEmail(email)) return "邮箱已被注册";
+        if(!code.equals(registerEmailVO.getCode())) return "验证码错误，请检查验证码";
+        String password = encoder.encode(registerEmailVO.getPassword());
+        Account ac =
+                new Account(null,registerEmailVO.getUsername(),password,email,Const.DEFAULT_ROLE,registerEmailVO.getNickname(), Const.DEFAULT_AVATAR,new Date());
+        if(!this.save(ac)){
+            return "系统错误，请联系管理员";
+        }
+        deleteVerifyCode(Const.REGISTER_EMAIL_CODE + email);
+        return null;
     }
 
     @Override
     public String resetConfirm(ConfirmResetVO confirmResetVO) {
-        return "";
+        String email = confirmResetVO.getEmail();
+        String code = template.opsForValue().get(Const.RESET_EMAIL_CODE + email);
+        if(!isExistEmail(email)) return "邮箱不存在";
+        if(code == null || confirmResetVO.getCode() == null) return "请先获取验证码";
+        if(!code.equals(confirmResetVO.getCode())) return "验证码错误，请检查验证码";
+        return null;
     }
 
     @Override
     public String resetEmailAccount(RegisterEmailVO registerEmailVO) {
-        return "";
+        String message = resetConfirm(new ConfirmResetVO(registerEmailVO.getEmail(),registerEmailVO.getCode()));
+        if(message != null) return message;
+        String email = registerEmailVO.getEmail();
+        boolean update = this.update().eq("email",email).set("password",encoder.encode(registerEmailVO.getPassword())).update();
+        if(update){
+            deleteVerifyCode(Const.RESET_EMAIL_CODE + email);
+            return null;
+        }
+        return "内部错误，请联系管理员";
     }
 
     @Override
     public Account findAccountById(Long id) {
-        return null;
+        return baseMapper.selectById(id);
     }
 
     @Override
     public AccountVO convertToAccountVO(Account account) {
-        return null;
+        return account.asViewObj(AccountVO.class);
+    }
+
+    private boolean isExistEmail(String email){
+        return this.query().eq("email",email).exists();
+    }
+
+    private void deleteVerifyCode(String key){
+        template.delete(key);
+    }
+    public String generateCode(int length){
+        StringBuilder code = new StringBuilder();
+        for(int i = 0;i < length;i++){
+            code.append(new Random().nextInt(10));
+        }
+        return code.toString();
     }
 }
