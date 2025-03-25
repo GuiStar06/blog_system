@@ -1,4 +1,7 @@
 package com.guistar.service;
 
-public interface CommentService {
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.guistar.entity.Comment;
+
+public interface CommentService extends IService<Comment> {
 }

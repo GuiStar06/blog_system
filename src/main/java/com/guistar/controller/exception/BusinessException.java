@@ -1,7 +1,12 @@
 package com.guistar.controller.exception;
 
 public class BusinessException extends RuntimeException {
-  public BusinessException(String message) {
-    super(message);
-  }
+    private final int code;
+    public BusinessException(int code,String message) {
+        super(message);
+        this.code = code;
+    }
+    public int getCode(){
+        return code;
+    }
 }

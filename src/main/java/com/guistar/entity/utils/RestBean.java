@@ -1,17 +1,20 @@
-package com.guistar.entity;
+package com.guistar.entity.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
+import org.slf4j.MDC;
 
-public record RestBean<T>(int code, T data, String message) {
+import java.util.Optional;
+
+public record RestBean<T>(long reqId,int code, T data, String message) {
     public static <T> RestBean<T> success(T data) {
-        return new RestBean<>(200,data,"请求成功!");
+        return new RestBean<>(requestId(),200,data,"请求成功!");
     }
     public static <T> RestBean<T> success(){
         return success(null);
     }
     public static <T> RestBean<T> failure(int code,String message){
-        return new RestBean<>(code,null,message);
+        return new RestBean<>(requestId(),code,null,message);
     }
     public String asJsonString(){
         return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls);
@@ -21,5 +24,9 @@ public record RestBean<T>(int code, T data, String message) {
     }
     public static <T> RestBean<T> unauthorized(String message){
         return failure(401,message);
+    }
+    private static long requestId(){
+        String id = Optional.ofNullable(MDC.get("reqId")).toString();
+        return Long.parseLong(id);
     }
 }

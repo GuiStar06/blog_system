@@ -1,6 +1,10 @@
-package com.example.config;
+package com.guistar.config;
 
-import com.example.entity.Const;
+import com.guistar.entity.Account;
+import com.guistar.entity.utils.Const;
+import com.guistar.service.AccountService;
+import com.guistar.utils.JwtUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,20 +15,23 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.io.IOException;
+import java.io.PipedWriter;
 
 @Configuration
 public class SecurityConfig {
+
+    @Resource
+    AccountService accountService;
+
+    @Resource
+    JwtUtils utils;
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(conf -> conf.requestMatchers("/api/auth/**")
-                .permitAll().anyRequest().hasAnyRole(Const.DefaultRole))
+                .permitAll().anyRequest().hasAnyRole(Const.DEFAULT_ROLE))
                 .formLogin(conf -> conf
                         .loginProcessingUrl("/api/auth/login")
                         .failureHandler(this::onAuthenticationFailure)
@@ -43,21 +50,30 @@ public class SecurityConfig {
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
+        response.setContentType("application/json;charset=utf-8");
     }
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
+        response.setContentType("application/json;charset=utf-8");
+        PipedWriter writer = new PipedWriter();
+        User user = (User) authentication.getPrincipal();
+        Account ac = accountService.findAccountByUsernameOrEmail(user.getUsername());
+        String jwt = utils.createJwt(ac.getId(),user,ac.getUsername());
     }
     public void onLogoutSuccess(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Authentication authentication) throws IOException, ServletException {
+        response.setContentType("application/json;charset=utf-8");
     }
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        response.setContentType("application/json;charset=utf-8");
     }
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
+        response.setContentType("application/json;charset=utf-8");
     }
 }
