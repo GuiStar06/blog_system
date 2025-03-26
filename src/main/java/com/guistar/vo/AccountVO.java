@@ -1,9 +1,12 @@
 package com.guistar.vo;
 
+import lombok.Data;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-public class AccountVO {
+@Data
+public class AccountVO implements Serializable {
     String username;
     String nickname;
     String avatar;

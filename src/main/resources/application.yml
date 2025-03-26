@@ -2,7 +2,7 @@ spring:
   datasource:
     url: localhost:3306/test
     username: root
-    password: 20060704
+    password: your-password
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     oauth2:
@@ -17,18 +17,17 @@ spring:
     host: smtp.163.com
     port: 465
     username: c19859572508@163.com
-    password: VVfQH7VDsHign2pk
+    password: your-password
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.guistar.entity
   global-config:
     db-config:
       id-type: auto
-      field-strategy: not_empty
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
 logging:
   level:
     org.springframework.security: INFO
-    com.baomidou.mybatisplus: INFO
+    com.baomidou.mybatis plus: INFO
