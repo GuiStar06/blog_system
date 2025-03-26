@@ -13,4 +13,6 @@ public class Const {
     public static final String USER_ID = "userId";
     public static final String REGISTER_EMAIL_CODE = "register:email:code";
     public static final String RESET_EMAIL_CODE = "reset:email:code";
+    public static final int DEFAULT_PAGE_NUM = 1;
+    public static final int DEFAULT_PAGE_SIZE = 10;
 }

@@ -25,6 +25,9 @@ public record RestBean<T>(long reqId,int code, T data, String message) {
     public static <T> RestBean<T> unauthorized(String message){
         return failure(401,message);
     }
+    public static <T> RestBean<T> illegalArgs(String message){
+        return failure(400,message);
+    }
     private static long requestId(){
         String id = Optional.ofNullable(MDC.get("reqId")).toString();
         return Long.parseLong(id);

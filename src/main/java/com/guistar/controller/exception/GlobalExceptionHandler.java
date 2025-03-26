@@ -31,4 +31,10 @@ public class GlobalExceptionHandler {
         log.error("系统异常:{}",e.getMessage());
         return RestBean.failure(500,"系统错误，请联系管理员");
     }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public RestBean<?> handleIllegalArgsException(IllegalAccessException e){
+        log.error("参数异常:{}",e.getMessage());
+        return RestBean.illegalArgs(e.getMessage());
+    }
 }
