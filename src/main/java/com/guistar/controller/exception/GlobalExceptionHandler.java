@@ -13,12 +13,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public RestBean<?> handleBusinessException(BusinessException e){
-        log.error("业务异常:{}",e.getMessage());
-        return RestBean.failure(e.getCode(),e.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public RestBean<?> handleValidationException(MethodArgumentNotValidException e){
         String errMsg = e.getBindingResult().getFieldErrors()
