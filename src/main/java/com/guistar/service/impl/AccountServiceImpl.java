@@ -7,8 +7,8 @@ import com.guistar.mapper.AccountMapper;
 import com.guistar.service.AccountService;
 import com.guistar.utils.FlowUtils;
 import com.guistar.vo.AccountVO;
-import com.guistar.vo.RegisterEmailVO;
-import com.guistar.vo.ResetEmailVO;
+import com.guistar.dto.RegisterEmailDTO;
+import com.guistar.dto.ResetEmailDTO;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -78,15 +78,15 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public String registerEmailAccount(RegisterEmailVO registerEmailVO) {
-        String email = registerEmailVO.getEmail();
+    public String registerEmailAccount(RegisterEmailDTO registerEmailDTO) {
+        String email = registerEmailDTO.getEmail();
         String code = template.opsForValue().get(Const.REGISTER_EMAIL_CODE + email);
-        if(code == null || registerEmailVO.getCode() == null) return "请先获取验证码";
+        if(code == null || registerEmailDTO.getCode() == null) return "请先获取验证码";
         if(isExistEmail(email)) return "邮箱已被注册";
-        if(!code.equals(registerEmailVO.getCode())) return "验证码错误，请检查验证码";
-        String password = encoder.encode(registerEmailVO.getPassword());
+        if(!code.equals(registerEmailDTO.getCode())) return "验证码错误，请检查验证码";
+        String password = encoder.encode(registerEmailDTO.getPassword());
         Account ac =
-                new Account(null,registerEmailVO.getUsername(),password,email,Const.DEFAULT_ROLE,registerEmailVO.getNickname(), Const.DEFAULT_AVATAR,new Date());
+                new Account(null, registerEmailDTO.getUsername(),password,email,Const.DEFAULT_ROLE, registerEmailDTO.getNickname(), Const.DEFAULT_AVATAR,new Date());
         if(!this.save(ac)){
             return "系统错误，请联系管理员";
         }
@@ -95,13 +95,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public String resetEmailAccount(ResetEmailVO resetEmailVO) {
-        String email = resetEmailVO.getEmail();
+    public String resetEmailAccount(ResetEmailDTO resetEmailDTO) {
+        String email = resetEmailDTO.getEmail();
         String code = template.opsForValue().get(Const.RESET_EMAIL_CODE + email);
         if(isExistEmail(email)) return "邮箱已被注册";
-        if(code == null || resetEmailVO.getCode() == null) return "请先获取验证码";
-        if(!code.equals(resetEmailVO.getCode())) return "验证码错误，请检查验证码";
-        String password = encoder.encode(resetEmailVO.getPassword());
+        if(code == null || resetEmailDTO.getCode() == null) return "请先获取验证码";
+        if(!code.equals(resetEmailDTO.getCode())) return "验证码错误，请检查验证码";
+        String password = encoder.encode(resetEmailDTO.getPassword());
         boolean update = this.update().eq("email",email).set("password",password).update();
         if(update){
             deleteVerifyCode(code);

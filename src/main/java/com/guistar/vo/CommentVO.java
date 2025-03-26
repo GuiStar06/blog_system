@@ -8,5 +8,5 @@ public class CommentVO {
     Long id;
     String content;
     LocalDateTime createTime;
-    AccountVO author;
+    CommentAccountVO commentAccountVO;
 }

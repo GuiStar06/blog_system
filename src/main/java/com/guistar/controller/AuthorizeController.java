@@ -2,8 +2,8 @@ package com.guistar.controller;
 
 import com.guistar.entity.utils.RestBean;
 import com.guistar.service.AccountService;
-import com.guistar.vo.RegisterEmailVO;
-import com.guistar.vo.ResetEmailVO;
+import com.guistar.dto.RegisterEmailDTO;
+import com.guistar.dto.ResetEmailDTO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -23,8 +23,8 @@ public class AuthorizeController {
     AccountService accountService;
 
     @PostMapping("/register")
-    public RestBean<Void> registerEmailAccount(@RequestBody @Valid RegisterEmailVO registerEmailVO){
-        return messageHandle(() -> accountService.registerEmailAccount(registerEmailVO));
+    public RestBean<Void> registerEmailAccount(@RequestBody @Valid RegisterEmailDTO registerEmailDTO){
+        return messageHandle(() -> accountService.registerEmailAccount(registerEmailDTO));
     }
 
     @GetMapping("/ask-code")
@@ -37,8 +37,8 @@ public class AuthorizeController {
     }
 
     @PostMapping("/reset")
-    public RestBean<Void> resetEmailAccount(@RequestBody @Valid ResetEmailVO resetEmailVO){
-        return messageHandle(() -> accountService.resetEmailAccount(resetEmailVO));
+    public RestBean<Void> resetEmailAccount(@RequestBody @Valid ResetEmailDTO resetEmailDTO){
+        return messageHandle(() -> accountService.resetEmailAccount(resetEmailDTO));
     }
 
     private RestBean<Void> messageHandle(Supplier<String> action){

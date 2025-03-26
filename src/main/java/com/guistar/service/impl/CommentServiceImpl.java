@@ -11,7 +11,7 @@ import com.guistar.service.AccountService;
 import com.guistar.service.CommentService;
 import com.guistar.utils.PermissionUtils;
 import com.guistar.utils.SecurityUtils;
-import com.guistar.vo.AccountVO;
+import com.guistar.vo.CommentAccountVO;
 import com.guistar.vo.CommentVO;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.AccessDeniedException;
@@ -41,16 +41,21 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
     @Override
-    public Comment getCommentById(Long id) {
-        return this.baseMapper.selectById(id);
+    public CommentVO getCommentVOById(Long id) {
+        return convertToCommentVO(findCommentById(id));
     }
 
     @Override
     public CommentVO convertToCommentVO(Comment comment) {
         Long currentAccountId = securityUtils.getCurrentAccountId();
         Account ac = accountService.findAccountById(currentAccountId);
-        AccountVO author = accountService.convertToAccountVO(ac);
-        return comment.asViewObj(CommentVO.class,commentVO -> commentVO.setAuthor(author));
+        return comment.asViewObj(CommentVO.class,commentVO -> commentVO.setCommentAccountVO(convertToCommentAcVO(ac)));
+    }
+
+    public Comment convertToComment(CommentDTO commentDTO){
+        Comment comment = commentDTO.asViewObj(Comment.class,comment1 -> comment1.setId(null));
+        comment.setAccountId(securityUtils.getCurrentAccountId());
+        return comment;
     }
 
     @Override
@@ -87,7 +92,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return baseMapper.deleteById(commentId) > 0;
     }
 
-    private Comment findCommentById(Long commentId){
+    public Comment findCommentById(Long commentId){
         return this.query().eq("id",commentId).one();
+    }
+
+    private CommentAccountVO convertToCommentAcVO(Account ac){
+        return ac.asViewObj(CommentAccountVO.class);
     }
 }

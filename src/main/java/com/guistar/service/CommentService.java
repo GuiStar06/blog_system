@@ -10,7 +10,9 @@ import java.util.List;
 
 public interface CommentService extends IService<Comment> {
     CommentVO createComment(CommentDTO commentDTO);
-    Comment getCommentById(Long id);
+    Comment findCommentById(Long commentId);
+    CommentVO getCommentVOById(Long id);
+    Comment convertToComment(CommentDTO commentDTO);
     CommentVO convertToCommentVO(Comment comment);
     List<CommentVO> listCommentByArticleId(Long articleId);
     Page<CommentVO> pageCommentVOByArticleId(int pageNum,int pageSize,Long articleId);

@@ -12,6 +12,6 @@ public class ArticleVO {
     String content;
     LocalDateTime createTime;
     LocalDateTime updateTime;
-    AccountVO author;
+    ArticleAccountVO articleAccountVO;
     List<CommentVO> comments;
 }

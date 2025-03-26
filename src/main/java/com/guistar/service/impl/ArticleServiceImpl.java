@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.guistar.dto.ArticleDTO;
+import com.guistar.entity.Account;
 import com.guistar.entity.Article;
 import com.guistar.entity.utils.Const;
 import com.guistar.mapper.ArticleMapper;
@@ -13,7 +14,7 @@ import com.guistar.service.ArticleService;
 import com.guistar.service.CommentService;
 import com.guistar.utils.PermissionUtils;
 import com.guistar.utils.SecurityUtils;
-import com.guistar.vo.AccountVO;
+import com.guistar.vo.ArticleAccountVO;
 import com.guistar.vo.ArticleVO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Resource;
@@ -123,27 +124,28 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public ArticleVO convertToArticleVO(Article article) {
-        AccountVO author = accountService.convertToAccountVO(accountService.findAccountById(article.getAccountId()));
+        ArticleAccountVO articleAccountVO = convertToArticleAcVO(accountService.findAccountById(article.getAccountId()));
         ArticleVO vo = article.asViewObj(ArticleVO.class,articleVO -> articleVO.setId(null));
-        vo.setAuthor(author);
+        vo.setArticleAccountVO(articleAccountVO);
         vo.setComments(commentService.listCommentByArticleId(article.getId()));
         return vo;
+    }
+
+    private ArticleAccountVO convertToArticleAcVO(Account account){
+        return account.asViewObj(ArticleAccountVO.class);
     }
 
     private Article getArticleById(Long id){
         return baseMapper.selectById(id);
     }
 
-    private List<Article> getAllArticles(int pageNum,int pageSize){
-        if(pageNum <= 0 || pageSize <= 0){
-            throw new IllegalArgumentException("分页参数不合法");
-        }
-        Page<Article> page = new Page<>(pageNum,pageSize);
+    private List<Article> getAllArticles(){
+        Page<Article> page = new Page<>(Const.DEFAULT_PAGE_NUM, Const.DEFAULT_PAGE_SIZE);
         return baseMapper.selectPage(page,null).getRecords().stream().toList();
     }
 
     private List<Article> getArticlesByAccountId(Long accountId){
-        if(accountId == null) return getAllArticles(Const.DEFAULT_PAGE_NUM, Const.DEFAULT_PAGE_SIZE);
+        if(accountId == null) return getAllArticles();
         Page<Article> page = new Page<>(Const.DEFAULT_PAGE_NUM, Const.DEFAULT_PAGE_SIZE);
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Article::getAccountId,accountId);
