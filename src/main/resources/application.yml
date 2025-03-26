@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: localhost:3306/test
+    url: localhost:3306/guistar
     username: root
-    password: your-password
+    password: chb20060704
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     oauth2:
@@ -17,7 +17,7 @@ spring:
     host: smtp.163.com
     port: 465
     username: c19859572508@163.com
-    password: your-password
+    password: VVfQH7VDsHign2pk
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.guistar.entity
