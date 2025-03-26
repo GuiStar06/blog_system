@@ -23,4 +23,8 @@ public class PermissionUtils {
     public boolean isAdminOrAuthor(Long currentAccountId,Long authorId){
         return isAdmin(currentAccountId) || currentAccountId.equals(authorId);
     }
+
+    public boolean isAuthor(Long currentAccountId,Long authorId){
+        return currentAccountId.equals(authorId);
+    }
 }
