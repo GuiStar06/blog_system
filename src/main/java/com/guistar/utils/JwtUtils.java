@@ -34,7 +34,7 @@ public class JwtUtils {
     @Resource
     StringRedisTemplate template;
 
-    private static Algorithm algorithm = Algorithm.HMAC256(key);
+    private static final Algorithm algorithm = Algorithm.HMAC256(key);
 
 
     public Date expireTime(){
