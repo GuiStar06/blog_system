@@ -29,7 +29,7 @@ public record RestBean<T>(long reqId,int code, T data, String message) {
         return failure(400,message);
     }
     private static long requestId(){
-        String id = Optional.ofNullable(MDC.get("reqId")).toString();
-        return Long.parseLong(id);
+        String id = MDC.get("reqId");
+        return id == null ? -1 : Long.parseLong(id);
     }
 }

@@ -24,17 +24,17 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtUtils {
 
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.key}")
-    private static String key;
-
     @Value("${spring.security.oauth2.resourceserver.jwt.expire}")
     private int expire;
 
     @Resource
     StringRedisTemplate template;
 
-    private static final Algorithm algorithm = Algorithm.HMAC256(key);
+    private final Algorithm algorithm;
+
+    public JwtUtils(@Value("${spring.security.oauth2.resourceserver.jwt.key}") String key) {
+        this.algorithm = Algorithm.HMAC256(key);
+    }
 
 
     public Date expireTime(){

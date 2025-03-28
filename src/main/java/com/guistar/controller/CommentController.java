@@ -33,7 +33,7 @@ public class CommentController {
         return RestBean.success(commentService.convertToCommentVO(comment));
     }
 
-    @GetMapping("/{id}")
+    @DeleteMapping("/{id}")
     public RestBean<Boolean> deleteCommentById(@RequestParam @PathVariable Long id){
         if(id == null) return RestBean.illegalArgs("评论id不能为空");
         return RestBean.success(commentService.deleteCommentById(id));

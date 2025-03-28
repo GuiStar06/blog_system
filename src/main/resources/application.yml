@@ -9,7 +9,7 @@ spring:
       resourceserver:
         jwt:
           key: chb20060704
-          expire: 7 * 24
+          expire: 168
   main:
     allow-bean-definition-overriding: false
   mail:
